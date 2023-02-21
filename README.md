@@ -27,7 +27,7 @@ After copying wp-cli.yml to your root WordPress folder, open it and plugin your 
 
 - *development:* Your local development environment. Likely DevKinsta. 
 - *staging:* The staging environment. Likely Kinsta. 
-- *producction:* The production environment. Likely Kinsta. 
+- *production:* The production environment. Likely Kinsta. 
 
 Once you've configured [WP CLI](https://developer.wordpress.org/cli/commands/), you can run CLI commands in each environment by using an `@alias` (`development` `@staging`, `@production`). For example:
 
