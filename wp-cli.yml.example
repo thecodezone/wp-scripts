@@ -1,0 +1,23 @@
+#Development will likely come from DevKinsta. 
+#PStaging and production will likely come from Kinsta.
+@development:
+   ssh: docker:www-data@devkinsta_fpm/www/kinsta/public/[DEVKINSTA_SITE] #docker:www-data@devkinsta_fpm/www/kinsta/public/site
+   port: 22
+   host: devkinsta_fpm
+   path: /www/kinsta/public/DEVKINSTA_SITE #/www/kinsta/public/site
+   url: http://[DEVKINSTA_SITE].local:[DEVKINSTA_PORT] #http://site.local:11111
+   username: docker:www-data@dev
+@staging:
+   ssh: [KINSTA_SSH_USER]@[KINSTA_SSH_HOST]:[KINSTA_SSH_PORT][KINSTA_PATH] #user@1.1.1.1:11111/www/site_111/public
+   port: [KINSTA_SSH_PORT] #11111
+   host: [KINSTA_SSH_HOST] #1.1.1.1
+   path: [KINSTA_PATH] #/www/site_111/public
+   url: [KINSTA_DOMAIN] #https://site.com
+   username: [KINSTA_SSH_USER] #user
+@production:
+   ssh: [KINSTA_SSH_USER]@[KINSTA_SSH_HOST]:[KINSTA_SSH_PORT][KINSTA_PATH] #user@1.1.1.1:11111/www/site_111/public
+   port: [KINSTA_SSH_PORT] #11111
+   host: [KINSTA_SSH_HOST] #1.1.1.1
+   path: [KINSTA_PATH] #/www/site_111/public
+   url: [KINSTA_DOMAIN] #https://site.com
+   username: [KINSTA_SSH_USER] #user

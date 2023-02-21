@@ -1,0 +1,4 @@
+#!/bin/bash
+source yml >> /dev/null 2>&1
+
+create_variables "../wp-cli.yml" "wp_"
