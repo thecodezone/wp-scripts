@@ -19,7 +19,7 @@ git clone git@github.com:thecodezone/wp-scripts.git scripts
 cp scripts/wp-cli.yml.example wp-cli.yml
 ```
 
-After copying wp-cli.yml to your root WordPress folder, open it and plugin your environment settings from DevKinsta and Kinsta. 
+After copying wp-cli.yml to your root WordPress folder, open it and plug in your environment settings from DevKinsta and Kinsta. 
 
 ### WP CLI
 
