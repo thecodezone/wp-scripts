@@ -4,6 +4,9 @@
 # Version 1.2.0
 # Copyright (c) Ben 
 
+cwd=$(pwd)
+cd "$(dirname "$0")"
+
 source wp_cli
 
 DEVDIR="."
@@ -148,7 +151,7 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       wp db export --default-character-set=utf8mb4 - | wp "@$TO" db import - &&
       wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
     else
-      wp "@$TO" db export --default-character-set=utf8mb4 &&
+      wp "@$TO" db export bkup.sql --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
       wp "@$FROM" db export --default-character-set=utf8mb4 - > db.sql  &&
       wp "@$TO" db import db.sql &&
@@ -187,3 +190,5 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   # fi
   echo -e "\n🔄  Sync from $FROM to $TO complete.\n\n    ${bold}$TOSITE${normal}\n"
 fi
+
+cd "$(cwd)"
