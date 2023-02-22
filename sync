@@ -70,7 +70,7 @@ case "$1-$2" in
   staging-development)    DIR="down ⬇️ "           FROMSITE=$STAGSITE; FROMDIR=$STAGEDIR; FROMPORT=$STAGEPORT; TOPORT=$DEVPORT; TOSITE=$DEVSITE;  TODIR=$DEVDIR; ;;
   development-production) DIR="up ⬆️ "             FROMSITE=$DEVSITE;  FROMDIR=$DEVDIR;  FROMPORT=$DEVPORT; TOPORT=$PRODPORT; TOSITE=$PRODSITE; TODIR=$PRODDIR; ;;
   development-staging)    DIR="up ⬆️ "             FROMSITE=$DEVSITE;  FROMDIR=$DEVDIR;  FROMPORT=$DEVPORT; TOPORT=$STAGEPORT; TOSITE=$STAGESITE; TODIR=$STAGEDIR; ;;
-  production-staging)     DIR="horizontally ↔️ ";  FROMSITE=$PRODSITE; FROMDIR=$PRODDIR; FROMPORT=$PRODPORT; TOPORT=$STAGEDIR; TOSITE=$STAGESITE; TODIR=$STAGEDIR; ;;
+  production-staging)     DIR="horizontally ↔️ ";  FROMSITE=$PRODSITE; FROMDIR=$PRODDIR; FROMPORT=$PRODPORT; TOPORT=$STAGEPORT; TOSITE=$STAGESITE; TODIR=$STAGEDIR; ;;
   staging-production)     DIR="horizontally ↔️ ";  FROMSITE=$STAGESITE; FROMDIR=$STAGEDIR; FROMPORT=$STAGEPORT; TOPORT=$PRODPORT; TOSITE=$PRODSITE; TODIR=$PRODDIR; ;;
   *) echo "usage: $0 [[--no-db] [--no-assets] [--local]] production development | staging development | development staging | development production | staging production | production staging" && exit 1 ;;
 esac
@@ -150,11 +150,16 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       wp "@$TO" db reset --yes &&
       wp db export --default-character-set=utf8mb4 - | wp "@$TO" db import - &&
       wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
-    else
+    elif [[ $FROM == "development" || $TO == "development" ]]; then
       wp "@$TO" db export bkup.sql --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
       wp "@$FROM" db export --default-character-set=utf8mb4 - > db.sql  &&
       wp "@$TO" db import db.sql &&
+      wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+    else
+      wp "@$TO" db export --default-character-set=utf8mb4 &&
+      wp "@$TO" db reset --yes &&
+      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp "@$TO" db import - &&
       wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
     fi
   fi
@@ -170,7 +175,7 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       [[ $TODIR =~ ^(.*): ]] && TOHOST=${BASH_REMATCH[1]}
       [[ $TODIR =~ ^(.*):(.*)$ ]] && TODIR=${BASH_REMATCH[2]}
 
-      ssh -p $FROMPORT -o ForwardAgent=yes $FROMHOST "rsync -aze 'ssh -o StrictHostKeyCheckingno -p $TOPORT' --progress $FROMDIR/wp-content/uploads/ $TOHOST:$TODIR/wp-content/uploads/"
+      ssh -p $FROMPORT -o ForwardAgent=yes $FROMHOST "rsync -aze 'ssh -o StrictHostKeyChecking=no -p $TOPORT' --progress $FROMDIR/wp-content/uploads/ $TOHOST:$TODIR/wp-content/uploads/"
       ssh -p $FROMPORT -o ForwardAgent=yes $FROMHOST "rsync -aze 'ssh -o StrictHostKeyChecking=no -p $TOPORT' --progress $FROMDIR/wp-content/plugins/ $TOHOST:$TODIR/wp-content/plugins/"
 
     elif [[ $DIR == "down"* ]]; then
@@ -191,4 +196,4 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   echo -e "\n🔄  Sync from $FROM to $TO complete.\n\n    ${bold}$TOSITE${normal}\n"
 fi
 
-cd "$(cwd)"
+cd $cwd
