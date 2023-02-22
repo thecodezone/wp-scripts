@@ -1,4 +1,11 @@
 
+<p align="center">
+  <a href="https://codezone.io/">
+    <img alt="CodeZone" src="https://prismic-io.s3.amazonaws.com/codezone/5f2169a6-d854-478d-b0d4-93e8b18d0bb7_cz-lines-orange-dark.svg" height="100">
+  </a>
+</p>
+
+
 CZ WordPress Scripts
 --------------------
 
@@ -12,7 +19,7 @@ git clone git@github.com:thecodezone/wp-scripts.git scripts
 cp scripts/wp-cli.yml.example wp-cli.yml
 ```
 
-After copying wp-cli.yml to your root WordPress folder, open it and plugin your environment settings from DevKinsta and Kinsta. 
+After copying wp-cli.yml to your root WordPress folder, open it and plug in your environment settings from DevKinsta and Kinsta. 
 
 ### WP CLI
 
@@ -20,7 +27,7 @@ After copying wp-cli.yml to your root WordPress folder, open it and plugin your 
 
 - *development:* Your local development environment. Likely DevKinsta. 
 - *staging:* The staging environment. Likely Kinsta. 
-- *producction:* The production environment. Likely Kinsta. 
+- *production:* The production environment. Likely Kinsta. 
 
 Once you've configured [WP CLI](https://developer.wordpress.org/cli/commands/), you can run CLI commands in each environment by using an `@alias` (`development` `@staging`, `@production`). For example:
 
