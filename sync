@@ -13,13 +13,18 @@ DEVDIR="."
 DEVSITE=$wp_development__url
 DEVPORT=$wp_development__port
 
+STAGEDIR="${wp_staging__username}@${wp_staging__host}:${wp_staging__path}"
+STAGESITE=$wp_staging__url
+STAGEPORT=$wp_staging__port
+
 PRODDIR="${wp_production__username}@${wp_production__host}:${wp_production__path}"
 PRODSITE=$wp_production__url
 PRODPORT=$wp_production__port
 
-STAGEDIR="${wp_staging__username}@${wp_staging__host}:${wp_staging__path}"
-STAGESITE=$wp_staging__url
-STAGEPORT=$wp_staging__port
+#Strip trailing slashes from URLs
+DEVSITE=$(echo $DEVSITE | sed 's:/*$::')
+STAGESITE=$(echo $STAGESITE | sed 's:/*$::')
+PRODSITE=$(echo $PRODSITE | sed 's:/*$::')
 
 LOCAL=false
 NO_DB=false
