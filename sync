@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Syncing Trellis & Bedrock-based WordPress environments with WP-CLI aliases (Kinsta version)
-# Version 1.2.0
-# Copyright (c) Ben 
-
 cwd=$(pwd)
 cd "$(dirname "$0")"
 
@@ -135,7 +131,7 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
     if [[ $AVAILTO == *"Error"* ]]; then
       echo "❌  Unable to connect to $TO $AVAILTO"
-      #exit 1
+      exit 1
     else
       echo "✅  Able to connect to $TO"
     fi
@@ -148,32 +144,63 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     if [[ "$LOCAL" = true && $TO == "development" ]]; then
       wp db export --default-character-set=utf8mb4 &&
       wp db reset --yes &&
-      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp db import - &&
-      wp search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp db import -
     elif [[ "$LOCAL" = true && $FROM == "development" ]]; then
       wp "@$TO" db export --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
-      wp db export --default-character-set=utf8mb4 - | wp "@$TO" db import - &&
-      wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+      wp db export --default-character-set=utf8mb4 - | wp "@$TO" db import -
     elif [[ $FROM == "development" || $TO == "development" ]]; then
       wp "@$TO" db export bkup.sql --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
       wp "@$FROM" db export --default-character-set=utf8mb4 - > db.sql  &&
-      wp "@$TO" db import db.sql &&
-      wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+      wp "@$TO" db import db.sql
+
     else
       wp "@$TO" db export --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
-      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp "@$TO" db import - &&
-      wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp "@$TO" db import
     fi
+
+    TOHTTP=$(echo $TOSITE | sed 's/https/http/g')
+    FROMHTTP=$(echo $FROMSITE | sed 's/https/http/g')
+    TOHTTPS=$(echo $TOHTTP | sed 's/http/https/g')
+    FROMHTTPS=$(echo $FROMHTTP | sed 's/http/https/g')
+
+    echo "Updating $FROMSITE URLs to $TOSITE..."
+
+    if [[ "$LOCAL" = true && $FROM != "development" ]]; then
+      if [[ "$TOSITE$" == *"http"* ]]; then
+        if [[ "$TOSITE$" == *"https"* ]]; then
+          wp search-replace "$FROMHTTPS" "$TOHTTPS" --all-tables-with-prefix &&
+          wp search-replace "$FROMHTTP" "$TOHTTPS" --all-tables-with-prefix
+        else
+          wp search-replace "$FROMHTTPS" "$TOHTTP" --all-tables-with-prefix &&
+          wp search-replace "$FROMHTTP" "$TOHTTP" --all-tables-with-prefix
+        fi
+      else
+          wp search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+      fi
+    else
+      if [[ "$TOSITE$" == *"http"* ]]; then
+        if [[ "$TOSITE$" == *"https"* ]]; then
+          wp "@$TO" search-replace "$FROMHTTPS" "$TOHTTPS" --all-tables-with-prefix &&
+          wp "@$TO" search-replace "$FROMHTTP" "$TOHTTPS" --all-tables-with-prefix
+        else
+          wp "@$TO" search-replace "$FROMHTTPS" "$TOHTTP" --all-tables-with-prefix &&
+          wp "@$TO" search-replace "$FROMHTTP" "$TOHTTP" --all-tables-with-prefix
+        fi
+      else
+          wp "@$TO" search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+      fi
+    fi
+  
   fi
 
-  if [ "$NO_ASSETS" = false ]
-  then
+  if [ "$NO_ASSETS" = false ]; then
   echo "Syncing assets..."
     # Sync uploads directory
-    chmod -R 755 wp-content/uploads/ &&
+    chmod -R 755 wp-content/uploads/
+
     if [[ $DIR == "horizontally"* ]]; then
       [[ $FROMDIR =~ ^(.*): ]] && FROMHOST=${BASH_REMATCH[1]}
       [[ $FROMDIR =~ ^(.*):(.*)$ ]] && FROMDIR=${BASH_REMATCH[2]}
@@ -193,12 +220,7 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     fi
   fi
 
-  # Slack notification when sync direction is up or horizontal
-  # if [[ $DIR != "down"* ]]; then
-  #   USER="$(git config user.name)"
-  #   curl -X POST -H "Content-type: application/json" --data "{\"attachments\":[{\"fallback\": \"\",\"color\":\"#36a64f\",\"text\":\"🔄 Sync from ${FROMSITE} to ${TOSITE} by ${USER} complete \"}],\"channel\":\"#site\"}" https://hooks.slack.com/services/xx/xx/xx
-  # fi
   echo -e "\n🔄  Sync from $FROM to $TO complete.\n\n    ${bold}$TOSITE${normal}\n"
 fi
 
-cd $cwd
+cd ${cwd}
