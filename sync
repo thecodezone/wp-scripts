@@ -25,12 +25,17 @@ PRODSITE=$(echo $PRODSITE | sed 's:/*$::')
 LOCAL=false
 NO_DB=false
 NO_ASSETS=false
+NO_EXPORT=false
 POSITIONAL_ARGS=()
 
 while [[ $# -gt 0 ]]; do
   case $1 in
     --no-db)
       NO_DB=true
+      shift
+      ;;
+    --no-export)
+      NO_EXPORT=true
       shift
       ;;
     --no-assets)
@@ -56,7 +61,7 @@ set -- "${POSITIONAL_ARGS[@]}"
 
 if [ $# != 2 ]
 then
-  echo "Usage: $0 [[--no-db] [--no-assets] [--local]] [ENV_FROM] [ENV_TO]"
+  echo "Usage: $0 [[--no-db] [--no-export] [--no-assets] [--local]] [ENV_FROM] [ENV_TO]"
 exit;
 fi
 
@@ -149,16 +154,20 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       wp "@$TO" db export --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
       wp db export --default-character-set=utf8mb4 - | wp "@$TO" db import -
-    elif [[ $FROM == "development" || $TO == "development" ]]; then
-      wp "@$TO" db export bkup.sql --default-character-set=utf8mb4 &&
-      wp "@$TO" db reset --yes &&
-      wp "@$FROM" db export --default-character-set=utf8mb4 - > db.sql  &&
+    elif [ "$TO" == "development" ]; then
+     if [ "$NO_EXPORT" = false ]; then
+        wp "@$TO" db export bkup.sql --default-character-set=utf8mb4
+      fi
+      wp "@$TO" db reset --yes 
+      if [ "$NO_EXPORT" = false ]; then
+        wp "@$FROM" db export --default-character-set=utf8mb4 - > db.sql
+      fi
       wp "@$TO" db import db.sql
 
     else
       wp "@$TO" db export --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
-      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp "@$TO" db import
+      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp "@$TO" db import -
     fi
 
     TOHTTP=$(echo $TOSITE | sed 's/https/http/g')
