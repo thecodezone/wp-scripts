@@ -160,7 +160,8 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       fi
       wp "@$TO" db reset --yes 
       if [ "$NO_EXPORT" = false ]; then
-        wp "@$FROM" db export --default-character-set=utf8mb4 - > db.sql
+        wp "@$FROM" db export db.sql --default-character-set=utf8mb4
+        rsync -avz -e "ssh -p $FROMPORT"  --progress $FROMDIR/db.sql $TODIR
       fi
       wp "@$TO" db import db.sql
 
