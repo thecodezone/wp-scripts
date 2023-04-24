@@ -167,13 +167,16 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
       wp "@$TO" db reset --yes 
       if [ "$NO_EXPORT" = false ]; then
         wp "@$FROM" db export db.sql --default-character-set=utf8mb4
-        rsync -avz -e "ssh -p $FROMPORT"  --progress $FROMDIR/db.sql $TODIR
+        rsync -avz -e "ssh -p $FROMPORT" --progress $FROMDIR/db.sql $TODIR
       fi
       wp "@$TO" db import db.sql
     else
-      wp "@$TO" db export --default-character-set=utf8mb4 &&
+      wp "@$TO" db export bkup.sql --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
-      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp "@$TO" db import -
+      wp "@$FROM" db export db.sql --default-character-set=utf8mb4
+      rsync -avz -e "ssh -p $FROMPORT" --progress $FROMDIR/db.sql .
+      rsync -avz -e "ssh -p $TOPORT" --progress db.sql $TODIR
+      wp "@$TO" db import db.sql
     fi
 
     TOHTTP=$(echo $TOSITE | sed 's/https/http/g')
