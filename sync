@@ -147,11 +147,17 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   then
   echo "Syncing database..."
     if [[ "$LOCAL" = true && $TO == "development" ]]; then
-      wp db export --default-character-set=utf8mb4 &&
-      wp db reset --yes &&
-      wp "@$FROM" db export --default-character-set=utf8mb4 - | wp db import -
+      if [ "$NO_EXPORT" = false ]; then
+        wp db export bkup.sql --default-character-set=utf8mb4
+      fi
+      wp db reset --yes 
+      if [ "$NO_EXPORT" = false ]; then
+        wp "@$FROM" db export db.sql --default-character-set=utf8mb4
+        rsync -avz -e "ssh -p $FROMPORT"  --progress $FROMDIR/db.sql $TODIR
+      fi
+      wp db import db.sql
     elif [[ "$LOCAL" = true && $FROM == "development" ]]; then
-      wp "@$TO" db export --default-character-set=utf8mb4 &&
+      wp "@$TO" db export bkup.sql --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
       wp db export --default-character-set=utf8mb4 - | wp "@$TO" db import -
     elif [ "$TO" == "development" ]; then
@@ -164,7 +170,6 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         rsync -avz -e "ssh -p $FROMPORT"  --progress $FROMDIR/db.sql $TODIR
       fi
       wp "@$TO" db import db.sql
-
     else
       wp "@$TO" db export --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
