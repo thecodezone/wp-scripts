@@ -44,8 +44,11 @@ The sync script copies databases, uploads and plugins between sites.
 The sync script
 > scripts/sync [env] [env]
 
-Sync from production to development
+Sync from production to development if your development environment is remote or docker-based
 > scripts/sync production development
+
+Sync from production to development if your development runs environment is on your local machine ourside of a VM
+> scripts/sync production development --local
 
 Sync from production to staging
 > scripts/sync production/staging
