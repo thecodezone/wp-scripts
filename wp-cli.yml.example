@@ -1,12 +1,12 @@
-#Development will likely come from DevKinsta. 
-#PStaging and production will likely come from Kinsta.
+#Development DEVELOPMENT_HOST is likely the name of your docker container and will likely come from the docker-compose.yml file in your theme folder or Docker Desktop. 
+#Staging and production will likely come from Kinsta.
 @development:
-   ssh: docker:www-data@devkinsta_fpm/www/kinsta/public/[DEVKINSTA_SITE] #docker:www-data@devkinsta_fpm/www/kinsta/public/site
-   port: 22
-   host: devkinsta_fpm
-   path: /www/kinsta/public/DEVKINSTA_SITE #/www/kinsta/public/site
-   url: http://[DEVKINSTA_SITE].local:[DEVKINSTA_PORT] #http://site.local:11111
-   username: docker:www-data@dev
+    ssh: docker:www-data@[DEVELOPMENT_HOST]/var/www/html
+    port: 22
+    host: [DEVELOPMENT_HOST]
+    path: /var/www/html
+    url: http://localhost:8080 
+    username: www-data
 @staging:
    ssh: [KINSTA_SSH_USER]@[KINSTA_SSH_HOST]:[KINSTA_SSH_PORT][KINSTA_PATH] #user@1.1.1.1:11111/www/site_111/public
    port: [KINSTA_SSH_PORT] #11111
