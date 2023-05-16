@@ -52,32 +52,3 @@ Sync from production to development if your development runs environment is on y
 
 Sync from production to staging
 > scripts/sync production/staging
-
-## Configuring Wordpress for Docker-based Development
-
-Be sure the following line is /etc/hosts
-
-```
-127.0.0.1 host.docker.internal
-```
-
-Add the following DB configuration to `wp-config.php`.
-
-``` php
-define( 'DB_NAME', 'your_db_name' );
-
-/** Database username */
-define( 'DB_USER', 'root' );
-
-/** Database password */
-define( 'DB_PASSWORD', '' );
-
-/** Database hostname */
-define( 'DB_HOST', 'host.docker.internal' );
-
-/** Database charset to use in creating database tables. */
-define( 'DB_CHARSET', 'utf8' );
-
-/** The database collate type. Don't change this if in doubt. */
-define( 'DB_COLLATE', '' );
-```
