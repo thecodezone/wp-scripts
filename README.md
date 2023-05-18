@@ -53,31 +53,16 @@ Sync from production to development if your development runs environment is on y
 Sync from production to staging
 > scripts/sync production/staging
 
-## Configuring Wordpress for Docker-based Development
+### scripts/clonein
 
-Be sure the following line is /etc/hosts
+The clonein script clones a git repository into an existing directory. This is useful for WordPress
+sites with the git root in the root of the WordPress install instead of in the theme folder.
 
-```
-127.0.0.1 host.docker.internal
-```
+Clone into your existing directory. 
 
-Add the following DB configuration to `wp-config.php`.
+> scripts/clonein git@github.com:thecodezone/your-repo.git .
 
-``` php
-define( 'DB_NAME', 'your_db_name' );
+Clone a theme into a fresh WordPress install.
 
-/** Database username */
-define( 'DB_USER', 'root' );
-
-/** Database password */
-define( 'DB_PASSWORD', '' );
-
-/** Database hostname */
-define( 'DB_HOST', 'host.docker.internal' );
-
-/** Database charset to use in creating database tables. */
-define( 'DB_CHARSET', 'utf8' );
-
-/** The database collate type. Don't change this if in doubt. */
-define( 'DB_COLLATE', '' );
-```
+> wp core download your-folder
+> scripts/clonein git@github.com:thecodezone/your-repo.git your-folder
