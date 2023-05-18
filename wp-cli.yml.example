@@ -5,7 +5,7 @@
     port: 22
     host: [DEVELOPMENT_HOST]
     path: /var/www/html
-    url: http://localhost:8080 
+    url: http://host.docker.internal:8080 
     username: www-data
 @staging:
    ssh: [KINSTA_SSH_USER]@[KINSTA_SSH_HOST]:[KINSTA_SSH_PORT][KINSTA_PATH] #user@1.1.1.1:11111/www/site_111/public
