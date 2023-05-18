@@ -1,0 +1,48 @@
+#!/bin/bash
+
+POSITIONAL_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1")
+      shift
+      ;;
+  esac
+done
+
+set -- "${POSITIONAL_ARGS[@]}"
+
+if [ $# != 2 ]
+then
+    echo "Usage: $0 [GIT_URL] [DIR]"
+    exit;
+fi
+
+CWD=$(pwd)
+GIT_URL=$1
+TO_DIR=$2
+TEMP_DIR=${CWD}/clone-in-tmp
+GIT_DIR=$TEMP_DIR/.git
+
+echo "Would you really like to clone $GIT_URL into $TO_DIR?"
+
+read -r -p " [y/N] " response
+
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    #Strip trailing slash
+    TO_DIR=$(echo $TO_DIR | sed 's:/*$::')
+
+    rm -rf $TO_DIR/.git
+    rm -rf $TEMP_DIR
+    git clone --no-checkout $GIT_URL $TEMP_DIR
+    mv $TEMP_DIR/.git $TO_DIR/.
+    rm -rf $TEMP_DIR
+    cd $TO_DIR
+    git reset --hard HEAD
+    cd $cwd
+fi
