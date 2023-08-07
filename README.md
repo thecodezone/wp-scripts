@@ -14,7 +14,6 @@ Helpful scripts for working with WordPress.
 ## Setup
 
 ```
-cd ~/DevKinsta/public/your-site
 git clone git@github.com:thecodezone/wp-scripts.git scripts
 cp scripts/wp-cli.yml.example wp-cli.yml
 ```
