@@ -2,6 +2,7 @@
 
 #Move to script directory
 CWD=$(pwd)
+
 cd "$(dirname "$0")"
 
 #VARIABLES
@@ -42,7 +43,7 @@ cp $EXAMPLE_FILE $TEMP_FILE
 echo "Starting wp-cli.yml configuration. You'll may find answers the following questions in your Kinsta dashboard, your docker configuration, or by using 'ddev describe'"
 
 question DEVELOPMENT_USER "Enter the development user:" "www-data"
-question DEVELOPMENT_HOST "Enter the development host: (This is likely the name of your Docker container)" "web"
+question DEVELOPMENT_HOST "Enter the development host: (This is likely the name of your Docker container. Example: ddev-SITE_NAME-web)"
 question DEVELOPMENT_PORT "Enter the development port:" "22"
 question DEVELOPMENT_PATH "Enter the development path to the WordPress folder:" "/var/www/html"
 question DEVELOPMENT_DOMAIN "Enter the development domain: (example: http://host.ddev.site)"
