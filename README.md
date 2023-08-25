@@ -35,6 +35,12 @@ Once you've configured [WP CLI](https://developer.wordpress.org/cli/commands/), 
 
 ## Scripts
 
+### scripts/setup
+
+Configure the WP-CLI so that you can run commands in each environment.
+
+> scripts/setup
+
 ### scripts/sync
 
 The sync script copies databases, uploads and plugins between sites. 

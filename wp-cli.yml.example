@@ -1,23 +1,22 @@
-#Development DEVELOPMENT_HOST is likely the name of your docker container and will likely come from the docker-compose.yml file in your theme folder or Docker Desktop. 
-#Staging and production will likely come from Kinsta.
+
 @development:
-    ssh: docker:www-data@[DEVELOPMENT_HOST]/var/www/html
-    port: 22
+    ssh: docker:[DEVELOPMENT_USER]@[DEVELOPMENT_HOST][DEVELOPMENT_PATH]
+    port: [DEVELOPMENT_PORT]
     host: [DEVELOPMENT_HOST]
-    path: /var/www/html
-    url: http://host.docker.internal:8080 
-    username: www-data
+    path: [DEVELOPMENT_PATH]
+    url: [DEVELOPMENT_DOMAIN]
+    username: [DEVELOPMENT_USER]
 @staging:
-   ssh: [KINSTA_SSH_USER]@[KINSTA_SSH_HOST]:[KINSTA_SSH_PORT][KINSTA_PATH] #user@1.1.1.1:11111/www/site_111/public
-   port: [KINSTA_SSH_PORT] #11111
-   host: [KINSTA_SSH_HOST] #1.1.1.1
-   path: [KINSTA_PATH] #/www/site_111/public
-   url: [KINSTA_DOMAIN] #https://site.com
-   username: [KINSTA_SSH_USER] #user
+   ssh: [STAGING_USER]@[STAGING_HOST]:[STAGING_PORT][STAGING_PATH]
+   port: [STAGING_PORT]
+   host: [STAGING_HOST]
+   path: [STAGING_PATH]
+   url: [STAGING_DOMAIN]
+   username: [STAGING_USER]
 @production:
-   ssh: [KINSTA_SSH_USER]@[KINSTA_SSH_HOST]:[KINSTA_SSH_PORT][KINSTA_PATH] #user@1.1.1.1:11111/www/site_111/public
-   port: [KINSTA_SSH_PORT] #11111
-   host: [KINSTA_SSH_HOST] #1.1.1.1
-   path: [KINSTA_PATH] #/www/site_111/public
-   url: [KINSTA_DOMAIN] #https://site.com
-   username: [KINSTA_SSH_USER] #user
+   ssh: [PRODUCTION_USER]@[PRODUCTION_HOST]:[PRODUCTION_PORT][PRODUCTION_PATH]
+   port: [PRODUCTION_PORT]
+   host: [PRODUCTION_HOST]
+   path: [PRODUCTION_PATH]
+   url: [PRODUCTION_DOMAIN]
+   username: [PRODUCTION_USER]

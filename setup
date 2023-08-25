@@ -1,0 +1,84 @@
+#!/bin/bash
+
+#Move to script directory
+CWD=$(pwd)
+cd "$(dirname "$0")"
+
+#VARIABLES
+EXAMPLE_FILE="wp-cli.yml.example"
+TEMP_FILE=".wp-cli.yml"
+
+#FUNCTIONS
+
+#Replace a string in the temp file
+function replace() {
+  local SEARCH=$1
+  local REPLACE=$2
+  REPLACE=$REPLACE | tr -d '[:blank:]'
+  REPLACE=$(printf '%s\n' "$REPLACE" | sed -e 's/[\/&]/\\&/g')
+  sed -i "s/\[${SEARCH}\]/${REPLACE}/" $TEMP_FILE
+}
+
+#Ask the user a question and store it in a variable
+function question() {
+  local VAR=$1
+  local LABEL=$2
+  local DEFAULT="$3"
+  if [ -n "$DEFAULT"  ]
+    then
+      LABEL="$LABEL (Default $DEFAULT)"
+  fi
+  echo $LABEL
+  read $VAR
+  RESULT=$(eval echo \$$VAR)
+  if [ -z "$RESULT" ]
+    then
+      eval $VAR=$DEFAULT
+  fi
+}
+
+cp $EXAMPLE_FILE $TEMP_FILE
+
+echo "Starting wp-cli.yml configuration. You'll may find answers the following questions in your Kinsta dashboard, your docker configuration, or by using 'ddev describe'"
+
+question DEVELOPMENT_USER "Enter the development user:" "www-data"
+question DEVELOPMENT_HOST "Enter the development host: (This is likely the name of your Docker container)" "web"
+question DEVELOPMENT_PORT "Enter the development port:" "22"
+question DEVELOPMENT_PATH "Enter the development path to the WordPress folder:" "/var/www/html"
+question DEVELOPMENT_DOMAIN "Enter the development domain: (example: http://host.ddev.site)"
+
+question PRODUCTION_USER "Enter the production user:"
+question PRODUCTION_HOST "Enter the production host:"
+question PRODUCTION_PORT "Enter the production port:"
+question PRODUCTION_PATH "Enter the production path:"
+question PRODUCTION_DOMAIN "Enter the production domain:"
+
+question STAGING_USER "Enter the staging user:" $PRODUCTION_USER
+question STAGING_HOST "Enter the staging host:" $PRODUCTION_HOST
+question STAGING_PORT "Enter the staging port:" $PRODUCTION_PORT
+question STAGING_PATH "Enter the staging path:" $PRODUCTION_PATH
+question STAGING_DOMAIN "Enter the staging domain: (example: https://mysite.com)" $PRODUCTION_DOMAIN
+
+replace "DEVELOPMENT_USER" $DEVELOPMENT_USER
+replace "DEVELOPMENT_HOST" $DEVELOPMENT_HOST
+replace "DEVELOPMENT_PORT" $DEVELOPMENT_PORT
+replace "DEVELOPMENT_PATH" $DEVELOPMENT_PATH
+replace "DEVELOPMENT_DOMAIN" $DEVELOPMENT_DOMAIN
+
+replace "PRODUCTION_USER" $PRODUCTION_USER
+replace "PRODUCTION_HOST" $PRODUCTION_HOST
+replace "PRODUCTION_PORT" $PRODUCTION_PORT
+replace "PRODUCTION_PATH" $PRODUCTION_PATH
+replace "PRODUCTION_DOMAIN" $PRODUCTION_DOMAIN
+
+replace "STAGING_USER" $STAGING_USER
+replace "STAGING_HOST" $STAGING_HOST
+replace "STAGING_PORT" $STAGING_PORT
+replace "STAGING_PATH" $STAGING_PATH
+replace "STAGING_DOMAIN" $STAGING_DOMAIN
+
+mv -f $TEMP_FILE $CWD/'/wp-cli.yml'
+cd $CWD
+
+echo "Configuration complete. You can now use wp @development, wp @staging, and wp @production to run commands on your environments."
+
