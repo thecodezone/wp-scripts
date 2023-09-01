@@ -83,7 +83,7 @@ case "$1-$2" in
   development-staging)    DIR="up ⬆️ "             FROMSITE=$DEVSITE;  FROMDIR=$DEVDIR;  FROMPORT=$DEVPORT; TOPORT=$STAGEPORT; TOSITE=$STAGESITE; TODIR=$STAGEDIR; ;;
   production-staging)     DIR="horizontally ↔️ ";  FROMSITE=$PRODSITE; FROMDIR=$PRODDIR; FROMPORT=$PRODPORT; TOPORT=$STAGEPORT; TOSITE=$STAGESITE; TODIR=$STAGEDIR; ;;
   staging-production)     DIR="horizontally ↔️ ";  FROMSITE=$STAGESITE; FROMDIR=$STAGEDIR; FROMPORT=$STAGEPORT; TOPORT=$PRODPORT; TOSITE=$PRODSITE; TODIR=$PRODDIR; ;;
-  *) echo "usage: $0 [[--no-db] [--no-assets] [--local]] production development | staging development | development staging | development production | staging production | production staging" && exit 1 ;;
+  *) echo "usage: $0 [[--no-db] [--no-assets] [--ddev] [--local]] production development | staging development | development staging | development production | staging production | production staging" && exit 1 ;;
 esac
 
 if [ "$NO_DB" = false ]
@@ -137,6 +137,8 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     local AVAILTO
     if [[ "$LOCAL" = true && $TO == "development" ]]; then
       AVAILTO=$(wp option get home 2>&1)
+    elif [[ "$DDEV" = true && $TO == "development" ]]; then
+      AVAILTO=$(ddev wp option get home 2>&1)
     else
       AVAILTO=$(wp "@$TO" option get home 2>&1)
     fi

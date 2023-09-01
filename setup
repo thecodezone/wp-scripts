@@ -7,7 +7,7 @@ cd "$(dirname "$0")"
 
 #VARIABLES
 EXAMPLE_FILE="wp-cli.yml.example"
-TEMP_FILE=".wp-cli.yml"
+TEMP_FILE="wp-cli.yml.tmp"
 
 #FUNCTIONS
 
