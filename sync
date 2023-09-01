@@ -22,6 +22,7 @@ DEVSITE=$(echo $DEVSITE | sed 's:/*$::')
 STAGESITE=$(echo $STAGESITE | sed 's:/*$::')
 PRODSITE=$(echo $PRODSITE | sed 's:/*$::')
 
+DDEV=false
 LOCAL=false
 NO_DB=false
 NO_ASSETS=false
@@ -40,6 +41,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --no-assets)
       NO_ASSETS=true
+      shift
+      ;;
+    --ddev)
+      DDEV=true
       shift
       ;;
     --local)
@@ -99,7 +104,7 @@ fi
 
 echo
 echo "Would you really like to "
-echo $DB_MESSAGE 
+echo $DB_MESSAGE
 echo $ASSETS_MESSAGE
 read -r -p " [y/N] " response
 
@@ -114,6 +119,8 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
 
     if [[ "$LOCAL" = true && $FROM == "development" ]]; then
       AVAILFROM=$(wp option get home 2>&1)
+    elif [[ "$DDEV" = true && $FROM == "development" ]]; then
+      AVAILFROM=$(ddev wp option get home 2>&1)
     else
       AVAILFROM=$(wp "@$FROM" option get home 2>&1)
     fi
@@ -147,17 +154,33 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
   then
   echo "Syncing database..."
     if [[ "$LOCAL" = true && $TO == "development" ]]; then
+      if [ "$NO_EXPORT" = false ]; then
+        wp db export bkup.sql --default-character-set=utf8mb4
+      fi
       wp db reset --yes
       if [ "$NO_EXPORT" = false ]; then
         wp "@$FROM" db export db.sql --default-character-set=utf8mb4
         rsync -avz -e "ssh -p $FROMPORT"  --progress $FROMDIR/db.sql $TODIR
       fi
       wp db import db.sql
+    elif [[ "$DDEV" = true && $TO == "development" ]]; then
+        if [ "$NO_EXPORT" = false ]; then
+          ddev wp db export bkup.sql --default-character-set=utf8mb4
+        fi
+        ddev wp db reset --yes
+        if [ "$NO_EXPORT" = false ]; then
+          wp "@$FROM" db export db.sql --default-character-set=utf8mb4
+          rsync -avz -e "ssh -p $FROMPORT"  --progress $FROMDIR/db.sql $TODIR
+        fi
+        ddev wp db import db.sql
     elif [[ "$LOCAL" = true && $FROM == "development" ]]; then
       wp "@$TO" db export bkup.sql --default-character-set=utf8mb4 &&
       wp "@$TO" db reset --yes &&
       wp db export --default-character-set=utf8mb4 - | wp "@$TO" db import -
     elif [ "$TO" == "development" ]; then
+     if [ "$NO_EXPORT" = false ]; then
+        wp "@$TO" db export bkup.sql --default-character-set=utf8mb4
+      fi
       wp "@$TO" db reset --yes
       if [ "$NO_EXPORT" = false ]; then
         wp "@$FROM" db export db.sql --default-character-set=utf8mb4
@@ -191,6 +214,18 @@ if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         fi
       else
           wp search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
+      fi
+    elif [[ "$DDEV" = true && $FROM != "development" ]]; then
+      if [[ "$TOSITE$" == *"http"* ]]; then
+        if [[ "$TOSITE$" == *"https"* ]]; then
+          ddev wp search-replace "$FROMHTTPS" "$TOHTTPS" --all-tables-with-prefix &&
+          ddev wp search-replace "$FROMHTTP" "$TOHTTPS" --all-tables-with-prefix
+        else
+          ddev wp search-replace "$FROMHTTPS" "$TOHTTP" --all-tables-with-prefix &&
+          ddev wp search-replace "$FROMHTTP" "$TOHTTP" --all-tables-with-prefix
+        fi
+      else
+          ddev wp search-replace "$FROMSITE" "$TOSITE" --all-tables-with-prefix
       fi
     else
       if [[ "$TOSITE$" == *"http"* ]]; then
